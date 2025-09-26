@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <title>Floresta da Escolha</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background: linear-gradient(to bottom, #013220, #145A32);
+      color: #fff;
+      text-align: center;
+      padding: 20px;
+    }
+    .container {
+      max-width: 600px;
+      margin: auto;
+      background: rgba(0, 0, 0, 0.6);
+      padding: 20px;
+      border-radius: 12px;
+      box-shadow: 0 0 20px rgba(0,0,0,0.7);
+    }
+    h1 {
+      color: #F7DC6F;
+    }
+    .choices button {
+      margin: 10px;
+      padding: 12px 20px;
+      font-size: 16px;
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+      transition: 0.3s;
+    }
+    .choices button:hover {
+      opacity: 0.8;
+    }
+    .choices button:first-child {
+      background-color: #27AE60;
+      color: #fff;
+    }
+    .choices button:last-child {
+      background-color: #C0392B;
+      color: #fff;
+    }
+    #survival {
+      margin-top: 15px;
+      font-size: 18px;
+      font-weight: bold;
+      color: #F7DC6F;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>🌲 Floresta da Escolha 🌲</h1>
+    <p id="story">Bem-vindo à Floresta da Escolha! O seu objetivo é sobreviver.<br>
+      Seu índice de sobrevivência começa em <b>100 pontos</b>.</p>
+    <div class="choices" id="choices"></div>
+    <p id="survival">Índice de sobrevivência: 100</p>
+  </div>
+
+  <script>
+    let indice = 100;
+    let parte = 0;
+
+    const historia = [
+      {
+        texto: "Parte 1: Você está perdido na floresta e encontra uma mochila velha. O que você faz?",
+        opcoes: [
+          { texto: "Abrir a mochila e ver o que tem dentro.", efeito: 20, resultado: "Você encontra uma bússola e um pedaço de pão. Seu índice de sobrevivência aumenta em 20 pontos." },
+          { texto: "Deixar a mochila e seguir em frente.", efeito: 0, resultado: "Você ignora a mochila e segue em frente. Nenhuma mudança." }
+        ]
+      },
+      {
+        texto: "Parte 2: Você ouve um barulho estranho vindo dos arbustos. Parece um animal grande.",
+        opcoes: [
+          { texto: "Se esconder atrás de uma árvore, em silêncio.", efeito: 30, resultado: "Você se esconde. O animal passa sem te notar. +30 pontos." },
+          { texto: "Ignorar o barulho e continuar andando.", efeito: -40, resultado: "Você é surpreendido por um urso e se machuca. -40 pontos." }
+        ]
+      },
+      {
+        texto: "Parte 3: Você vê uma trilha bem marcada à esquerda e um atalho pela mata fechada à direita.",
+        opcoes: [
+          { texto: "Seguir a trilha, que parece mais segura.", efeito: 50, resultado: "A trilha te leva até uma cabana. +50 pontos." },
+          { texto: "Pegar o atalho para economizar tempo.", efeito: -30, resultado: "Você se perde na mata fechada. -30 pontos." }
+        ]
+      }
+    ];
+
+    function mostrarParte() {
+      if (parte < historia.length) {
+        document.getElementById("story").innerHTML = historia[parte].texto;
+        const botoes = historia[parte].opcoes.map((op, i) =>
+          `<button onclick="escolher(${i})">${op.texto}</button>`
+        ).join("");
+        document.getElementById("choices").innerHTML = botoes;
+      } else {
+        fimDeJogo();
+      }
+    }
+
+    function escolher(i) {
+      const escolha = historia[parte].opcoes[i];
+      indice += escolha.efeito;
+      document.getElementById("story").innerHTML = escolha.resultado;
+      document.getElementById("survival").innerText = "Índice de sobrevivência: " + indice;
+      document.getElementById("choices").innerHTML = `<button onclick="proxima()">Continuar</button>`;
+    }
+
+    function proxima() {
+      parte++;
+      mostrarParte();
+    }
+
+    function fimDeJogo() {
+      let resultado = "";
+      if (indice >= 150) {
+        resultado = `PARABÉNS! Você sobreviveu com louvor! 🌟`;
+      } else if (indice >= 100) {
+        resultado = `Você sobreviveu, mas foi uma jornada difícil. 💪`;
+      } else {
+        resultado = `Infelizmente você não sobreviveu à floresta. ❌`;
+      }
+      document.getElementById("story").innerHTML = resultado + "<br><br>Índice final: " + indice;
+      document.getElementById("choices").innerHTML = `<button onclick="location.reload()">Jogar novamente</button>`;
+    }
+
+    mostrarParte();
+  </script>
+</body>
+</html>
