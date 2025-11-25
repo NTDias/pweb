@@ -243,8 +243,7 @@ const nodes = [
 function renderNode(i){
     const n = nodes[i];
     elStory.textContent = n.story;
-    elQuestion.textContent = '
-' + n.q;
+    elQuestion.textContent = ' ' + n.q;
     elChoices.innerHTML = '';
 
     n.choices.forEach((c, idxChoice)=>{
