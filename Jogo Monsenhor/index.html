@@ -1,0 +1,353 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+<meta charset="UTF-8">
+<title>Floresta das Escolhas</title>
+<style>
+    body {
+        margin: 0;
+        font-family: "Trebuchet MS", sans-serif;
+        background: url('https://images.unsplash.com/photo-1501785888041-af3ef285b470?auto=format&fit=crop&w=1400&q=80') no-repeat center/cover;
+        height: 100vh;
+        color: #f2f2f2;
+        backdrop-filter: blur(3px);
+    }
+
+    #game {
+        max-width: 750px;
+        margin: auto;
+        margin-top: 30px;
+        padding: 20px 30px;
+        background: rgba(0,0,0,0.65);
+        border-radius: 15px;
+        box-shadow: 0 0 25px rgba(0,0,0,0.7);
+        animation: fadeIn 1s ease;
+    }
+
+    h1 {
+        text-align: center;
+        font-size: 32px;
+        text-shadow: 0 0 10px #000;
+        margin-bottom: 10px;
+    }
+
+    .stats {
+        display: flex;
+        justify-content: space-between;
+        padding: 10px;
+        margin-bottom: 20px;
+        background: rgba(255,255,255,0.1);
+        border-radius: 8px;
+    }
+
+    .choice-btn {
+        display: block;
+        width: 100%;
+        padding: 15px;
+        margin: 10px 0;
+        background: rgba(34,139,34,0.7);
+        color: white;
+        border: none;
+        border-radius: 10px;
+        cursor: pointer;
+        font-size: 18px;
+        transition: 0.3s;
+    }
+
+    .choice-btn:hover {
+        background: rgba(34,139,34,1);
+        transform: scale(1.03);
+    }
+
+    #text {
+        line-height: 1.6;
+        padding-bottom: 15px;
+        font-size: 18px;
+    }
+
+    @keyframes fadeIn {
+        from { opacity: 0; transform: translateY(20px); }
+        to   { opacity: 1; transform: translateY(0); }
+    }
+
+    .end-screen {
+        text-align: center;
+        font-size: 22px;
+        padding: 20px;
+    }
+
+    .final-good {
+        color: #9bff9b;
+        font-weight: bold;
+    }
+
+    .final-ok {
+        color: #fff99b;
+        font-weight: bold;
+    }
+
+    .final-bad {
+        color: #ff9b9b;
+        font-weight: bold;
+    }
+
+</style>
+</head>
+<body>
+
+<div id="game">
+    <h1>🌲 FLORESTA DAS ESCOLHAS 🌲</h1>
+
+    <div class="stats">
+        <div>🛡️ Sobrevivência: <span id="surv">100</span></div>
+        <div>💤 Esgotamento: <span id="tired">0</span></div>
+    </div>
+
+    <div id="text">Clique para começar sua jornada.</div>
+
+    <button class="choice-btn" onclick="startGame()">Iniciar Jornada</button>
+</div>
+
+
+<script>
+let indice = 100;
+let esgotamento = 0;
+let passo = 0;
+let escolha6 = null;
+
+const text = document.getElementById('text');
+const surv = document.getElementById('surv');
+const tired = document.getElementById('tired');
+const game = document.getElementById('game');
+
+function updateHUD() {
+    surv.textContent = indice;
+    tired.textContent = esgotamento;
+}
+
+function choose(a, b) {
+    const btns = document.querySelectorAll('.choice-btn');
+    btns.forEach(btn => btn.remove());
+    if (a) a();
+    if (b) b();
+}
+
+function next(texto, choices) {
+    text.innerHTML = texto;
+
+    choices.forEach(c => {
+        let btn = document.createElement("button");
+        btn.className = "choice-btn";
+        btn.textContent = c.label;
+        btn.onclick = () => {
+            choose(c.action);
+        };
+        game.appendChild(btn);
+    });
+}
+
+function startGame() {
+    passo = 1;
+    next(
+`=== DIA 1: O INÍCIO ===<br><br>
+Você encontra uma mochila no chão. O que faz?`,
+[
+    { label: "A) Abrir a mochila", action: () => { 
+        indice += 20; 
+        esgotamento += 10; 
+        updateHUD();
+        escolha1(); 
+    }},
+    { label: "B) Ignorar", action: () => { escolha1(); }}
+]);
+}
+
+function escolha1() {
+    next(
+`Você precisa de água. Há uma poça parada e um rio sujo.`,
+[
+    { label: "A) Filtrar no pano (-10 S, +5 E)", action: () => { 
+        indice -= 10; 
+        esgotamento += 5;
+        updateHUD();
+        escolha2();
+    }},
+    { label: "B) Beber da poça (-25 S)", action: () => { 
+        indice -= 25; 
+        updateHUD();
+        escolha2();
+    }}
+]);
+}
+
+function escolha2() {
+    next(
+`=== DIA 2 ===<br><br>
+Você escuta um urso à frente. O que faz?`,
+[
+    { label: "A) Fazer barulho (+15 S, +15 E)", action: () => {
+        indice += 15; 
+        esgotamento += 15;
+        updateHUD();
+        escolha3(); 
+    }},
+    { label: "B) Ficar imóvel (50% risco)", action: () => {
+        if (Math.random() < 0.5) {
+            indice -= 10;
+        }
+        updateHUD();
+        escolha3();
+    }}
+]);
+}
+
+function escolha3() {
+    next(
+`Escureceu. Abrigo necessário.`,
+[
+    { label: "A) Dormir na caverna (+10 S)", action: () => {
+        indice += 10;
+        updateHUD();
+        escolha4();
+    }},
+    { label: "B) Construir abrigo (+5 S, -20 E)", action: () => {
+        indice += 5;
+        esgotamento -= 20;
+        updateHUD();
+        escolha4();
+    }}
+]);
+}
+
+function escolha4() {
+    next(
+`=== DIA 3 ===<br><br>
+Você encontra frutas vermelhas (seguras) e azuis (desconhecidas).`,
+[
+    { label: "A) Comer só as vermelhas (+15 S)", action: () => {
+        indice += 15; updateHUD(); escolha5();
+    }},
+    { label: "B) Comer ambas (+10 S, mas risco)", action: () => {
+        if (esgotamento > 30) indice -= 40;
+        else indice += 10;
+        updateHUD(); escolha5();
+    }}
+]);
+}
+
+function escolha5() {
+    next(
+`Você encontra uma faca enferrujada e uma manta.`,
+[
+    { label: "A) Pegar a faca (+10 S)", action: () => {
+        indice += 10; 
+        escolha6 = "A"; 
+        updateHUD(); escolha6F();
+    }},
+    { label: "B) Pegar a manta (-10 E)", action: () => {
+        esgotamento -= 10; 
+        escolha6 = "B"; 
+        updateHUD(); escolha6F();
+    }}
+]);
+}
+
+function escolha6F() {
+    next(
+`=== DIA 4 ===<br><br>
+Um sobrevivente ferido precisa de ajuda.`,
+[
+    { label: "A) Ajudar (-20 S, +25 E)", action: () => {
+        indice -= 20;
+        esgotamento += 25;
+        updateHUD();
+        escolha7();
+    }},
+    { label: "B) Ignorar (+15 S)", action: () => {
+        indice += 15;
+        updateHUD();
+        escolha7();
+    }}
+]);
+}
+
+function escolha7() {
+    next(
+`Você precisa escolher um caminho.`,
+[
+    { label: "A) Atalho pelo pântano", action: () => {
+        if (escolha6 === "A") indice += 20;
+        else { indice -= 30; esgotamento += 10; }
+        updateHUD();
+        escolha8();
+    }},
+    { label: "B) Caminho seco (-10 E)", action: () => {
+        esgotamento -= 10;
+        updateHUD();
+        escolha8();
+    }}
+]);
+}
+
+function escolha8() {
+    next(
+`=== DIA 5 ===<br><br>
+Você vê fumaça (resgate) e luz (acampamento).`,
+[
+    { label: "A) Ir à fumaça (+40 S, -15 E)", action: () => {
+        indice += 40;
+        esgotamento -= 15;
+        updateHUD();
+        escolha9();
+    }},
+    { label: "B) Ir à luz (+10 S, -10 E)", action: () => {
+        indice += 10;
+        esgotamento -= 10;
+        updateHUD();
+        escolha9();
+    }}
+]);
+}
+
+function escolha9() {
+    next(
+`Portão final! Pular cerca ou procurar buraco?`,
+[
+    { label: "A) Pular (risco)", action: () => {
+        if (esgotamento >= 40) indice -= 50;
+        else indice += 20;
+        fim();
+    }},
+    { label: "B) Procurar passagem (+10 S)", action: () => {
+        indice += 10;
+        fim();
+    }}
+]);
+}
+
+function fim() {
+    indice -= esgotamento * 0.5;
+    game.innerHTML = `
+        <div class="end-screen">
+            <h1>🌲 FIM DA JORNADA 🌲</h1>
+            <p>Sobrevivência final: <strong>${indice.toFixed(2)}</strong></p>
+            <p>Esgotamento físico: <strong>${esgotamento}</strong></p>
+            <br>
+            ${resultadoFinal()}
+            <br><br>
+            <button class="choice-btn" onclick="location.reload()">Reiniciar Jogo</button>
+        </div>`;
+}
+
+function resultadoFinal() {
+    if (indice >= 120 && esgotamento < 50)
+        return `<p class="final-good">🏆 FINAL EXCELENTE! Você dominou a floresta!</p>`;
+    else if (indice >= 80)
+        return `<p class="final-ok">✅ FINAL BOM. Você escapou por pouco.</p>`;
+    else
+        return `<p class="final-bad">❌ FINAL RUIM. A floresta venceu desta vez...</p>`;
+}
+
+</script>
+</body>
+</html>
